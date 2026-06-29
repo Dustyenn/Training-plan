@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DUSTIN">
+<title>DUSTIN — HYROX + HM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --black: #0a0a0a;
+    --surface: #111111;
+    --card: #181818;
+    --border: #2a2a2a;
+    --orange: #FF4D00;
+    --orange-dim: rgba(255,77,0,0.15);
+    --orange-glow: rgba(255,77,0,0.08);
+    --white: #f5f5f5;
+    --grey: #888;
+    --grey-light: #bbb;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --yellow: #eab308;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 16px;
+    height: 56px;
+    padding-top: env(safe-area-inset-top);
+  }
+  nav h1 {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--white);
+    flex: 1;
+  }
+  nav h1 span { color: var(--orange); }
+  .nav-badge {
+    background: var(--orange); color: #fff;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    padding: 3px 8px; border-radius: 20px; text-transform: uppercase;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; overflow-x: auto; gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: none; padding: 12px 20px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--grey);
+    border-bottom: 2px solid transparent;
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.2s;
+    background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+  /* ── PANELS ── */
+  .panel { display: none; padding: 16px; }
+  .panel.active { display: block; }
+
+  /* ── HERO CARD ── */
+  .hero {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--orange), transparent);
+  }
+  .hero-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 8px;
+  }
+  .hero-title {
+    font-size: 28px; font-weight: 900; line-height: 1;
+    letter-spacing: -0.02em; margin-bottom: 4px;
+  }
+  .hero-sub { font-size: 13px; color: var(--grey); line-height: 1.5; }
+
+  /* ── STAT GRID ── */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .stat-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .stat {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 12px;
+  }
+  .stat-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); margin-bottom: 6px; }
+  .stat-value { font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: var(--white); }
+  .stat-value.orange { color: var(--orange); }
+  .stat-value.green { color: var(--green); }
+  .stat-sub { font-size: 10px; color: var(--grey); margin-top: 2px; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--grey);
+    margin: 20px 0 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── COACH NOTE ── */
+  .coach-note {
+    background: var(--orange-glow);
+    border: 1px solid rgba(255,77,0,0.3);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 12px 12px 0;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .coach-note p { font-size: 13px; line-height: 1.6; color: var(--grey-light); }
+  .coach-note strong { color: var(--white); }
+
+  /* ── SESSION CARD ── */
+  .session-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; margin-bottom: 10px; overflow: hidden;
+  }
+  .session-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; cursor: pointer;
+  }
+  .session-day {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  .day-mon { background: rgba(59,130,246,0.2); color: #60a5fa; }
+  .day-tue { background: rgba(255,77,0,0.2); color: var(--orange); }
+  .day-wed { background: rgba(234,179,8,0.2); color: #fbbf24; }
+  .day-thu { background: rgba(255,77,0,0.2); color: var(--orange); }
+  .day-fri { background: rgba(34,197,94,0.2); color: #4ade80; }
+  .day-sat { background: rgba(168,85,247,0.2); color: #c084fc; }
+  .day-sun { background: rgba(100,100,100,0.15); color: var(--grey); }
+  .session-info { flex: 1; }
+  .session-name { font-size: 14px; font-weight: 700; }
+  .session-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .tag {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 2px 7px; border-radius: 20px;
+  }
+  .tag-run { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .tag-strength { background: rgba(234,179,8,0.15); color: #fbbf24; }
+  .tag-hyrox { background: rgba(255,77,0,0.15); color: var(--orange); }
+  .tag-easy { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .tag-rest { background: rgba(100,100,100,0.15); color: var(--grey); }
+  .session-chevron { color: var(--grey); font-size: 12px; transition: transform 0.2s; }
+  .session-card.open .session-chevron { transform: rotate(180deg); }
+
+  .session-body { display: none; padding: 0 16px 16px; }
+  .session-card.open .session-body { display: block; }
+
+  .exercise-table { width: 100%; border-collapse: collapse; }
+  .exercise-table th {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--grey); padding: 6px 0; border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .exercise-table td {
+    font-size: 12px; color: var(--grey-light);
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+  .exercise-table td:first-child { color: var(--white); font-weight: 600; width: 40%; }
+  .exercise-table td:last-child { color: var(--grey); font-size: 11px; }
+  .exercise-table tr:last-child td { border-bottom: none; }
+
+  .ex-type {
+    font-size: 8px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--orange);
+    display: block; margin-bottom: 2px;
+  }
+
+  /* ── WEEK SCHEDULE ── */
+  .week-row {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 8px; padding: 14px 16px;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .week-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; font-weight: 700; color: var(--orange);
+    width: 24px; flex-shrink: 0; padding-top: 2px;
+  }
+  .week-phase {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 2px 7px; border-radius: 20px;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .phase-base { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .phase-thresh { background: rgba(234,179,8,0.15); color: #fbbf24; }
+  .phase-race-spec { background: rgba(255,77,0,0.15); color: var(--orange); }
+  .phase-taper { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .phase-race { background: var(--orange); color: #fff; }
+  .phase-recovery { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .week-details { flex: 1; }
+  .week-vol { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .week-desc { font-size: 11px; color: var(--grey); line-height: 1.5; }
+  .week-flag {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--orange);
+    margin-top: 4px;
+  }
+
+  /* ── GAP TABLE ── */
+  .gap-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; margin-bottom: 10px;
+  }
+  .gap-header {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .gap-row {
+    padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .gap-row:last-child { border-bottom: none; }
+  .gap-station { font-size: 13px; font-weight: 600; flex: 1; }
+  .gap-times { display: flex; gap: 12px; align-items: center; }
+  .gap-time { font-family: 'Space Mono', monospace; font-size: 11px; }
+  .gap-time.was { color: var(--grey); text-decoration: line-through; }
+  .gap-time.target { color: var(--orange); font-weight: 700; }
+  .gap-save { font-size: 10px; font-weight: 700; color: var(--green); }
+
+  /* ── RULES ── */
+  .rule-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; margin-bottom: 10px;
+    display: flex; gap: 14px;
+  }
+  .rule-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px; font-weight: 700; color: var(--orange);
+    opacity: 0.6; flex-shrink: 0; line-height: 1;
+  }
+  .rule-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .rule-body { font-size: 12px; color: var(--grey-light); line-height: 1.6; }
+
+  /* ── PREDICTIONS ── */
+  .pred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .pred-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px; text-align: center;
+  }
+  .pred-dist {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--orange); margin-bottom: 6px;
+  }
+  .pred-time { font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 700; }
+  .pred-pace { font-size: 10px; color: var(--grey); margin-top: 3px; }
+  .pred-delta { font-size: 10px; color: var(--green); font-weight: 700; margin-top: 4px; }
+
+  /* ── PROGRESS BARS ── */
+  .progress-item { margin-bottom: 14px; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .progress-label { font-size: 12px; font-weight: 600; }
+  .progress-vals { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--grey); }
+  .progress-vals span { color: var(--orange); }
+  .progress-track {
+    height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--orange), #ff8c00);
+    transition: width 0.8s ease;
+  }
+
+  /* ── RACE SPLITS ── */
+  .split-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .split-row:last-child { border-bottom: none; }
+  .split-seg { font-size: 12px; font-weight: 600; flex: 1; }
+  .split-target { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--orange); width: 50px; text-align: right; }
+  .split-cue { font-size: 10px; color: var(--grey); flex: 2; padding-left: 8px; }
+  .split-run { background: rgba(59,130,246,0.08); border-radius: 6px; padding: 9px 10px; }
+
+  /* ── NUTRITION ── */
+  .nutrition-row {
+    display: flex; gap: 12px; padding: 11px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .nutrition-row:last-child { border-bottom: none; }
+  .nutrition-timing { font-size: 11px; font-weight: 700; color: var(--orange); width: 110px; flex-shrink: 0; }
+  .nutrition-detail { font-size: 12px; color: var(--grey-light); line-height: 1.5; flex: 1; }
+
+  /* ── BENCHMARK TABLE ── */
+  .bench-row {
+    display: flex; gap: 8px; padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center;
+  }
+  .bench-row:last-child { border-bottom: none; }
+  .bench-metric { font-size: 12px; font-weight: 600; flex: 1.5; }
+  .bench-val { font-family: 'Space Mono', monospace; font-size: 10px; text-align: center; flex: 1; color: var(--grey); }
+  .bench-val.target { color: var(--orange); font-weight: 700; }
+  .bench-head { font-size: 9px; color: var(--grey); font-weight: 700; letter-spacing: 0.08em; }
+
+  .pill {
+    display: inline-block; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 20px;
+    background: rgba(255,77,0,0.15); color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<nav>
+  <h1>DUSTIN <span>// HYROX + HM</span></h1>
+  <span class="nav-badge">20 Weeks</span>
+</nav>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('overview')">Overview</button>
+  <button class="tab" onclick="showTab('weekly')">Sessions</button>
+  <button class="tab" onclick="showTab('schedule')">Schedule</button>
+  <button class="tab" onclick="showTab('gaps')">Gap Analysis</button>
+  <button class="tab" onclick="showTab('race')">Race Day</button>
+  <button class="tab" onclick="showTab('coach')">Coach Notes</button>
+</div>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div id="tab-overview" class="panel active">
+
+  <div class="hero">
+    <div class="hero-label">Primary Target · October 2026</div>
+    <div class="hero-title">Sub 1:25:00</div>
+    <div class="hero-sub">HYROX finish · currently 1:42:11 · closing 17:11</div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat">
+      <div class="stat-label">HM Target</div>
+      <div class="stat-value orange">1:44:59</div>
+      <div class="stat-sub">~2 weeks post-HYROX</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Current Prediction</div>
+      <div class="stat-value">1:49:20</div>
+      <div class="stat-sub">▼ 5m 6s vs 30 days ago</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">HM Race Pace</div>
+      <div class="stat-value orange">4:58</div>
+      <div class="stat-sub">per km</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">HYROX Run Pace</div>
+      <div class="stat-value">5:07</div>
+      <div class="stat-sub">per km × 8 runs</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Peak Week Vol</div>
+      <div class="stat-value">53 km</div>
+      <div class="stat-sub">Week 11</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">HR Target</div>
+      <div class="stat-value">170–175</div>
+      <div class="stat-sub">bpm race effort</div>
+    </div>
+  </div>
+
+  <div class="section-title">Your Current Fitness</div>
+  <div class="pred-grid">
+    <div class="pred-card">
+      <div class="pred-dist">5K</div>
+      <div class="pred-time">22:23</div>
+      <div class="pred-pace">4:29 /km</div>
+      <div class="pred-delta">Maintaining</div>
+    </div>
+    <div class="pred-card">
+      <div class="pred-dist">10K</div>
+      <div class="pred-time">46:28</div>
+      <div class="pred-pace">4:39 /km</div>
+      <div class="pred-delta">▼ 2m 30s</div>
+    </div>
+    <div class="pred-card">
+      <div class="pred-dist">Half</div>
+      <div class="pred-time">1:49:20</div>
+      <div class="pred-pace">5:11 /km</div>
+      <div class="pred-delta">▼ 5m 6s</div>
+    </div>
+    <div class="pred-card">
+      <div class="pred-dist">Full</div>
+      <div class="pred-time">4:12:26</div>
+      <div class="pred-pace">5:59 /km</div>
+      <div class="pred-delta">▼ 8m 48s</div>
+    </div>
+  </div>
+
+  <div class="section-title">The 4 Rules</div>
+
+  <div class="rule-card">
+    <div class="rule-num">01</div>
+    <div>
+      <div class="rule-title">Never Train Stations Fresh</div>
+      <div class="rule-body">Wall balls, lunges, and carries must come AFTER a run or hard set. Ottawa RPE 10 came from never training them tired.</div>
+    </div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-num">02</div>
+    <div>
+      <div class="rule-title">Run Your Real Pace in October</div>
+      <div class="rule-body">Push 5:07/km from the start. Conserving runs cost 6+ free minutes in Ottawa. Your aerobic engine is the gap.</div>
+    </div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-num">03</div>
+    <div>
+      <div class="rule-title">Wall Balls: Exhale Every Rep</div>
+      <div class="rule-body">Never hold your breath. This one habit can save 60–90 seconds by preventing the HR spike that breaks sets at rep 60.</div>
+    </div>
+  </div>
+  <div class="rule-card">
+    <div class="rule-num">04</div>
+    <div>
+      <div class="rule-title">The HM Plan Is Not Optional</div>
+      <div class="rule-body">Norwegian 4×4 and tempo runs build exactly the repeated-effort capacity you're missing. Do both, every week.</div>
+    </div>
+  </div>
+
+  <div class="section-title">Key Benchmarks</div>
+  <div class="gap-card">
+    <div class="gap-header">
+      <span>Metric</span>
+      <div style="display:flex;gap:20px;font-size:9px;color:var(--grey);">
+        <span>WK 8</span><span>WK 12</span><span style="color:var(--orange)">RACE</span>
+      </div>
+    </div>
+    <div class="bench-row">
+      <div class="bench-metric">HYROX Run Pace</div>
+      <div class="bench-val">5:30/km</div>
+      <div class="bench-val">5:15/km</div>
+      <div class="bench-val target">5:07/km</div>
+    </div>
+    <div class="bench-row">
+      <div class="bench-metric">Wall Balls</div>
+      <div class="bench-val">40+ unbroken</div>
+      <div class="bench-val">60+ unbroken</div>
+      <div class="bench-val target">80+ / 6:50</div>
+    </div>
+    <div class="bench-row">
+      <div class="bench-metric">Sandbag Lunge</div>
+      <div class="bench-val">improving</div>
+      <div class="bench-val">race weight</div>
+      <div class="bench-val target">5:11</div>
+    </div>
+    <div class="bench-row">
+      <div class="bench-metric">Tempo Pace</div>
+      <div class="bench-val">5:10/km</div>
+      <div class="bench-val">5:00/km</div>
+      <div class="bench-val target">4:58/km</div>
+    </div>
+    <div class="bench-row">
+      <div class="bench-metric">Long Run</div>
+      <div class="bench-val">17km easy</div>
+      <div class="bench-val">20km prog</div>
+      <div class="bench-val target">21km ready</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ WEEKLY SESSIONS ═══════════════ -->
+<div id="tab-weekly" class="panel">
+
+  <div class="coach-note">
+    <p><strong>Daily Movement Prep is non-negotiable.</strong> 12 min before every session. Skipping warmup above 45km/week is the #1 injury cause. Do it every day without exception.</p>
+  </div>
+
+  <!-- MON -->
+  <div class="session-card" onclick="toggleSession(this)">
+    <div class="session-header">
+      <div class="session-day day-mon">MON</div>
+      <div class="session-info">
+        <div class="session-name">Upper Strength + Easy Run</div>
+        <div class="session-tags">
+          <span class="tag tag-run">8km Easy</span>
+          <span class="tag tag-strength">Upper Body</span>
+        </div>
+      </div>
+      <div class="session-chevron">▼</div>
+    </div>
+    <div class="session-body">
+      <table class="exercise-table">
+        <tr><th>Exercise</th><th>Sets / Reps</th><th>Notes</th></tr>
+        <tr><td><span class="ex-type">Warmup</span>Movement Prep</td><td>Full protocol</td><td>Cat-Cow, WGS, 90/90, Glute Bridges, Band Pull-Aparts, Leg Swings</td></tr>
+        <tr><td><span class="ex-type">Run</span>Easy Recovery</td><td>8 km</td><td>145–150 bpm · fully conversational · HR over pace always</td></tr>
+        <tr><td><span class="ex-type">Plyo</span>Box Jumps</td><td>3×5 max height</td><td>Always before strength, never after</td></tr>
+        <tr><td><span class="ex-type">Plyo</span>Broad Jumps</td><td>2×5</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Plyo</span>Drop Jumps</td><td>2×5</td><td>Weeks 5+ only</td></tr>
+        <tr><td><span class="ex-type">Strength</span>Bench Press</td><td>4×6</td><td>75–80% 1RM</td></tr>
+        <tr><td><span class="ex-type">Strength</span>Weighted Pull-ups / Rows</td><td>4×8</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Shoulder</span>Face Pulls</td><td>3×15</td><td>Crucial for posture + shoulder health</td></tr>
+        <tr><td><span class="ex-type">Shoulder</span>YTW Raises</td><td>3×10 each</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Shoulder</span>Banded Ext. Rotations</td><td>3×20/side</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Injury Prev</span>Copenhagen Plank</td><td>3×20s/side</td><td>Adductor + hip stability</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- TUE -->
+  <div class="session-card" onclick="toggleSession(this)">
+    <div class="session-header">
+      <div class="session-day day-tue">TUE</div>
+      <div class="session-info">
+        <div class="session-name">Hard Intervals + HYROX Stations</div>
+        <div class="session-tags">
+          <span class="tag tag-run">Norwegian 4×4</span>
+          <span class="tag tag-hyrox">Stations</span>
+        </div>
+      </div>
+      <div class="session-chevron">▼</div>
+    </div>
+    <div class="session-body">
+      <div class="coach-note" style="margin-bottom:12px;">
+        <p><strong>Most important session of the week.</strong> Stations AFTER the run — never fresh. This is the race. You're RPE 10 at stations because you've never trained them tired.</p>
+      </div>
+      <table class="exercise-table">
+        <tr><th>Exercise</th><th>Protocol</th><th>Notes</th></tr>
+        <tr><td><span class="ex-type">Warmup</span>Movement Prep + Drills</td><td>12–15 min</td><td>Full protocol + A-skips + B-skips ×20m</td></tr>
+        <tr><td><span class="ex-type">Intervals</span>Norwegian 4×4 (Wks 1–8)</td><td>4×4 min</td><td>90–95% HRmax (~185 bpm) · 3 min active jog rest</td></tr>
+        <tr><td><span class="ex-type">Intervals</span>HM Pace Shifts (Wks 9+)</td><td>5×5 min</td><td>4:58/km · 170–175 bpm · or 3×10 min @ 4:58 with 2 min rest</td></tr>
+        <tr><td><span class="ex-type">Transition</span>Easy Jog</td><td>1 km</td><td>Recovery between intervals and stations — do NOT skip</td></tr>
+        <tr><td><span class="ex-type">Station</span>Sandbag/BB Walking Lunges</td><td>3×30m</td><td>Race weight or heavier · continuous · always after a run</td></tr>
+        <tr><td><span class="ex-type">Station</span>400m Run @ Tempo</td><td>3×400m</td><td>No full recovery between sets — training race fatigue</td></tr>
+        <tr><td><span class="ex-type">Station</span>Wall Balls — Unbroken</td><td>4×20</td><td>EXHALE every throw · rest only when you must</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- WED -->
+  <div class="session-card" onclick="toggleSession(this)">
+    <div class="session-header">
+      <div class="session-day day-wed">WED</div>
+      <div class="session-info">
+        <div class="session-name">Sprints + Station Volume + Hip Circuit</div>
+        <div class="session-tags">
+          <span class="tag tag-run">Sprints</span>
+          <span class="tag tag-hyrox">Volume</span>
+        </div>
+      </div>
+      <div class="session-chevron">▼</div>
+    </div>
+    <div class="session-body">
+      <table class="exercise-table">
+        <tr><th>Exercise</th><th>Protocol</th><th>Notes</th></tr>
+        <tr><td><span class="ex-type">Warmup</span>Movement Prep</td><td>10 min</td><td>Full protocol</td></tr>
+        <tr><td><span class="ex-type">Sprint</span>Flying 30s</td><td>6×30m build · 5×30m @ 95%</td><td>3 min full rest · stop if form breaks</td></tr>
+        <tr><td><span class="ex-type">Run</span>Shakeout Run</td><td>5 km</td><td>145–150 bpm max · conversational only</td></tr>
+        <tr><td><span class="ex-type">Station</span>Walking Lunges — Volume</td><td>4×20m</td><td>BW or light load · focus depth and hip stretch</td></tr>
+        <tr><td><span class="ex-type">Station</span>Wall Balls — Conditioning</td><td>5×20</td><td>4kg ball · breathing rhythm · exhale every rep · NOT max effort</td></tr>
+        <tr><td><span class="ex-type">Station</span>Farmer Carry</td><td>3×30m/hand</td><td>Heavy · grip and trap training</td></tr>
+        <tr><td><span class="ex-type">Hip Circuit</span>Lateral Band Walks</td><td>3×15</td><td>Lateral hip stability · IT band prevention</td></tr>
+        <tr><td><span class="ex-type">Hip Circuit</span>Clamshells</td><td>3×20/side</td><td>Glute medius activation</td></tr>
+        <tr><td><span class="ex-type">Hip Circuit</span>Fire Hydrants</td><td>3×15/side</td><td>Hip external rotation</td></tr>
+        <tr><td><span class="ex-type">Hip Circuit</span>SL Glute Bridges</td><td>3×12/side</td><td>Single-leg stability</td></tr>
+        <tr><td><span class="ex-type">Hip Circuit</span>Dead Bugs</td><td>3×10/side</td><td>Anti-rotation core</td></tr>
+        <tr><td><span class="ex-type">Hip Circuit</span>Bird Dogs (5s hold)</td><td>3×10/side</td><td>Posterior chain stability</td></tr>
+        <tr><td><span class="ex-type">Hip Circuit</span>Side Plank + Leg Lift</td><td>3×30s/side</td><td>Hip abductor strength</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- THU -->
+  <div class="session-card" onclick="toggleSession(this)">
+    <div class="session-header">
+      <div class="session-day day-thu">THU</div>
+      <div class="session-info">
+        <div class="session-name">Tempo Run + Lower Strength</div>
+        <div class="session-tags">
+          <span class="tag tag-run">10km Tempo</span>
+          <span class="tag tag-strength">Lower Body</span>
+        </div>
+      </div>
+      <div class="session-chevron">▼</div>
+    </div>
+    <div class="session-body">
+      <div class="coach-note" style="margin-bottom:12px;">
+        <p><strong>Bulgarian Split Squat is the #1 exercise</strong> for closing your sandbag lunge gap. Never skip it.</p>
+      </div>
+      <table class="exercise-table">
+        <tr><th>Exercise</th><th>Protocol</th><th>Notes</th></tr>
+        <tr><td><span class="ex-type">Warmup</span>Movement Prep</td><td>15 min</td><td>Especially important before squats + tempo</td></tr>
+        <tr><td><span class="ex-type">Tempo</span>HM Tempo Run</td><td>2km WU · 10km @ 4:58 · 2km CD</td><td>~170 bpm target · ~70 min total</td></tr>
+        <tr><td><span class="ex-type">Plyo</span>Lateral Bounds</td><td>3×6/side</td><td>Weeks 5–12</td></tr>
+        <tr><td><span class="ex-type">Plyo</span>Pogo Hops</td><td>3×15</td><td>Weeks 5–12</td></tr>
+        <tr><td><span class="ex-type">Strength</span>Back Squat</td><td>4×6</td><td>75–80% 1RM</td></tr>
+        <tr><td><span class="ex-type">Strength</span>Romanian Deadlift</td><td>3×8</td><td>Replaces conventional DL from week 5</td></tr>
+        <tr><td><span class="ex-type">Strength</span>Bulgarian Split Squat</td><td>3×10/leg</td><td>NEVER SKIP · Primary sandbag lunge builder</td></tr>
+        <tr><td><span class="ex-type">Strength</span>Hip Thrusts</td><td>3×8</td><td>Glute strength = lunge power at rep 80</td></tr>
+        <tr><td><span class="ex-type">Station</span>Goblet Squat → Wall Ball</td><td>3×15</td><td>Simulate wall ball with pre-fatigue</td></tr>
+        <tr><td><span class="ex-type">Injury Prev</span>Copenhagen Plank</td><td>3×20s/side</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Injury Prev</span>Pallof Press</td><td>3×12/side</td><td>Anti-rotation core stability</td></tr>
+        <tr><td><span class="ex-type">Injury Prev</span>SL Calf Raises</td><td>3×15/side</td><td>—</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- FRI -->
+  <div class="session-card" onclick="toggleSession(this)">
+    <div class="session-header">
+      <div class="session-day day-fri">FRI</div>
+      <div class="session-info">
+        <div class="session-name">Easy Run + Deep Mobility</div>
+        <div class="session-tags">
+          <span class="tag tag-easy">8km Easy</span>
+          <span class="tag tag-easy">Mobility</span>
+        </div>
+      </div>
+      <div class="session-chevron">▼</div>
+    </div>
+    <div class="session-body">
+      <table class="exercise-table">
+        <tr><th>Exercise</th><th>Duration</th><th>Notes</th></tr>
+        <tr><td><span class="ex-type">Run</span>Easy Run</td><td>8 km</td><td>145–155 bpm · do not push · HR over pace</td></tr>
+        <tr><td><span class="ex-type">Mobility</span>Pigeon Pose</td><td>2 min/side</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Mobility</span>Lizard Pose</td><td>90 sec/side</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Mobility</span>90/90 Stretch</td><td>2 min each</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Mobility</span>Couch Stretch</td><td>2 min/side</td><td>#1 hip flexor fix for desk workers</td></tr>
+        <tr><td><span class="ex-type">Foam Roll</span>Calves + IT Band + Quads + Lats</td><td>2 min each</td><td>8 min total</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- SAT -->
+  <div class="session-card" onclick="toggleSession(this)">
+    <div class="session-header">
+      <div class="session-day day-sat">SAT</div>
+      <div class="session-info">
+        <div class="session-name">Long Run (+ Monthly Race Sim)</div>
+        <div class="session-tags">
+          <span class="tag tag-run">Progressive Long</span>
+          <span class="tag tag-hyrox">Race Sim ×3</span>
+        </div>
+      </div>
+      <div class="session-chevron">▼</div>
+    </div>
+    <div class="session-body">
+      <table class="exercise-table">
+        <tr><th>Exercise</th><th>Protocol</th><th>Notes</th></tr>
+        <tr><td><span class="ex-type">Warmup</span>Movement Prep</td><td>10–12 min</td><td>Mandatory before long runs</td></tr>
+        <tr><td><span class="ex-type">Run</span>Progressive Long Run</td><td>See schedule</td><td>First 80%: 145–155 bpm. Form check every 3km. Last 4km: 4:58/km race pace.</td></tr>
+        <tr><td><span class="ex-type">Race Sim</span>1km @ 5:07/km</td><td>Wks 6 / 10 / 14</td><td>After 14–16km run straight into race sim</td></tr>
+        <tr><td><span class="ex-type">Race Sim</span>Sandbag Lunges 25m×4</td><td>Target &lt;5:11</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Race Sim</span>1km @ 5:07/km</td><td>—</td><td>—</td></tr>
+        <tr><td><span class="ex-type">Race Sim</span>100 Wall Balls</td><td>Target &lt;6:50</td><td>EXHALE every throw</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- SUN -->
+  <div class="session-card">
+    <div class="session-header">
+      <div class="session-day day-sun">SUN</div>
+      <div class="session-info">
+        <div class="session-name">Complete Rest</div>
+        <div class="session-tags"><span class="tag tag-rest">No Training</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCHEDULE ═══════════════ -->
+<div id="tab-schedule" class="panel">
+
+  <div class="section-title">Base Phase · Weeks 1–4</div>
+
+  <div class="week-row">
+    <div class="week-num">01</div>
+    <div class="week-phase phase-base">Base</div>
+    <div class="week-details">
+      <div class="week-vol">38 km · 14 km long</div>
+      <div class="week-desc">4×4 Norwegian + Sprints · 3× gym · Embed lunges + wall balls post-run · light loads</div>
+    </div>
+  </div>
+  <div class="week-row">
+    <div class="week-num">02</div>
+    <div class="week-phase phase-base">Base</div>
+    <div class="week-details">
+      <div class="week-vol">40 km · 15 km long</div>
+      <div class="week-desc">4×4 Norw + Tempo 8km · 3× gym · Build breathing habit on wall balls every session</div>
+    </div>
+  </div>
+  <div class="week-row">
+    <div class="week-num">03</div>
+    <div class="week-phase phase-base">Base</div>
+    <div class="week-details">
+      <div class="week-vol">43 km · 16 km long</div>
+      <div class="week-desc">4×4 Norw + Tempo 9km + Sprints · Hip circuit daily · volume building</div>
+    </div>
+  </div>
+  <div class="week-row" style="opacity:0.75;">
+    <div class="week-num">04</div>
+    <div class="week-phase phase-base">Base ↓</div>
+    <div class="week-details">
+      <div class="week-vol">36 km · 14 km long</div>
+      <div class="week-desc">4×4 Norw only · 2× gym · Recovery week · −20% volume · consolidate</div>
+    </div>
+  </div>
+
+  <div class="section-title">Threshold Phase · Weeks 5–8</div>
+
+  <div class="week-row">
+    <div class="week-num">05</div>
+    <div class="week-phase phase-thresh">Thresh</div>
+    <div class="week-details">
+      <div class="week-vol">45 km · 17 km long</div>
+      <div class="week-desc">4×4 Norw + Tempo 10km + Sprints · 3× gym · Increase lunge distance + WB reps weekly</div>
+    </div>
+  </div>
+  <div class="week-row">
+    <div class="week-num">06</div>
+    <div class="week-phase phase-thresh">Thresh</div>
+    <div class="week-details">
+      <div class="week-vol">47 km · 18 km mixed</div>
+      <div class="week-desc">4×4 Norw + Tempo 11km · 3× gym</div>
+      <div class="week-flag">⚡ RACE SIM — Sat long run + station circuit</div>
+    </div>
+  </div>
+  <div class="week-row">
+    <div class="week-num">07</div>
+    <div class="week-phase phase-thresh">Thresh</div>
+    <div class="week-details">
+      <div class="week-vol">49 km · 19 km mixed</div>
+      <div class="week-desc">4×4 Norw + Tempo 12km + Sprints · Norwegian sets adapting toward HM pace</div>
+    </div>
+  </div>
+  <div class="week-row" style="opacity:0.75;">
+    <div class="week-num">08</div>
+    <div class="week-phase phase-thresh">Thresh ↓</div>
+    <div class="week-details">
+      <div class="week-vol">40 km · 15 km long</div>
+      <div class="week-desc">4×4 Norw only · 2× gym (permanent from here) · Recovery</div>
+    </div>
+  </div>
+
+  <div class="section-title">Race-Specific Phase · Weeks 9–12</div>
+
+  <div class="week-row">
+    <div class="week-num">09</div>
+    <div class="week-phase phase-race-spec">Race Spec</div>
+    <div class="week-details">
+      <div class="week-vol">50 km · 19 km progressive</div>
+      <div class="week-desc">5×5 HM Intervals + Tempo 12km · All lunges at race weight · target 60+ unbroken WB</div>
+    </div>
+  </div>
+  <div class="week-row">
+    <div class="week-num">10</div>
+    <div class="week-phase phase-race-spec">Race Spec</div>
+    <div class="week-details">
+      <div class="week-vol">51 km · 20 km easy</div>
+      <div class="week-desc">HM Intervals + Tempo 13km · First 20km long run</div>
+      <div class="week-flag">⚡ RACE SIM #2</div>
+    </div>
+  </div>
+  <div class="week-row">
+    <div class="week-num">11</div>
+    <div class="week-phase phase-race-spec">Race Spec</div>
+    <div class="week-details">
+      <div class="week-vol">53 km · 20 km progressive</div>
+      <div class="week-desc">HM Intervals + Race Sim 14km @ pace · 80+ unbroken wall balls target</div>
+      <div class="week-flag">🔺 PEAK WEEK</div>
+    </div>
+  </div>
+  <div class="week-row" style="opacity:0.75;">
+    <div class="week-num">12</div>
+    <div class="week-phase phase-race-spec">Race Spec ↓</div>
+    <div class="week-details">
+      <div class="week-vol">42 km · 16 km easy</div>
+      <div class="week-desc">HM Intervals only · Drop Mon plyometrics from here · Recovery</div>
+    </div>
+  </div>
+
+  <div class="section-title">Taper Phase · Weeks 13–15</div>
+
+  <div class="week-row">
+    <div class="week-num">13</div>
+    <div class="week-phase phase-taper">Taper</div>
+    <div class="week-details">
+      <div class="week-vol">38 km · 16 km long</div>
+      <div class="week-desc">Sharpener + Strides · Volume −25% · Short station quality only</div>
+    </div>
+  </div>
+  <div class="week-row">
+    <div class="week-num">14</div>
+    <div class="week-phase phase-taper">Taper</div>
+    <div class="week-details">
+      <div class="week-vol">30 km · 13 km long</div>
+      <div class="week-desc">Sharpener + Strides</div>
+      <div class="week-flag">⚡ FULL HYROX SIMULATION</div>
+    </div>
+  </div>
+  <div class="week-row">
+    <div class="week-num">15</div>
+    <div class="week-phase phase-taper">Taper</div>
+    <div class="week-details">
+      <div class="week-vol">22 km · 10 km easy</div>
+      <div class="week-desc">Race Preview + 3km @ race pace Tue · Short sharp station work only · no heavy loading</div>
+    </div>
+  </div>
+
+  <div class="section-title">Race Weeks</div>
+
+  <div class="week-row" style="border-color: var(--orange);">
+    <div class="week-num" style="color:var(--white)">16</div>
+    <div class="week-phase phase-race">HYROX</div>
+    <div class="week-details">
+      <div class="week-vol" style="color:var(--orange)">RACE DAY — SUB 1:25:00</div>
+      <div class="week-desc">Mon–Tue easy shakeouts · Wed–Sat full rest · Sunday: RACE</div>
+    </div>
+  </div>
+  <div class="week-row" style="opacity:0.75;">
+    <div class="week-num">17</div>
+    <div class="week-phase phase-recovery">Recovery</div>
+    <div class="week-details">
+      <div class="week-vol">~20 km · easy only</div>
+      <div class="week-desc">Easy runs + light mobility · no intensity · HM in 1 week · keep legs moving</div>
+    </div>
+  </div>
+  <div class="week-row" style="border-color: var(--orange);">
+    <div class="week-num" style="color:var(--white)">18</div>
+    <div class="week-phase phase-race">HM</div>
+    <div class="week-details">
+      <div class="week-vol" style="color:var(--orange)">RACE DAY — SUB 1:45</div>
+      <div class="week-desc">Mon–Wed easy shakeouts · Thu–Sat rest · Sunday: race</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ GAP ANALYSIS ═══════════════ -->
+<div id="tab-gaps" class="panel">
+
+  <div class="hero">
+    <div class="hero-label">Ottawa Result · Time to Close</div>
+    <div class="hero-title">17:11</div>
+    <div class="hero-sub">1:42:11 → 1:25:00 · Two root causes</div>
+  </div>
+
+  <div class="coach-note">
+    <p><strong>Root Cause 1:</strong> RPE 3–4 on every run (costing 6+ free minutes).<br>
+    <strong>Root Cause 2:</strong> RPE 10 on Wall Balls, Sandbag Lunge, and Farmers Carry — undertrained under fatigue, not undertrained when fresh.</p>
+  </div>
+
+  <div class="section-title">Station Gaps</div>
+
+  <div class="gap-card">
+    <div class="gap-header">
+      <span>Station</span>
+      <div style="display:flex;gap:12px;font-size:9px;color:var(--grey);">
+        <span>Ottawa</span><span style="color:var(--orange)">Target</span><span style="color:var(--green)">Saves</span>
+      </div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-station">Wall Balls (100 reps)</div>
+      <div class="gap-times">
+        <span class="gap-time was">11:22</span>
+        <span class="gap-time target">6:50</span>
+        <span class="gap-save">−4:32</span>
+      </div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-station">Sandbag Lunge (100m)</div>
+      <div class="gap-times">
+        <span class="gap-time was">9:23</span>
+        <span class="gap-time target">5:11</span>
+        <span class="gap-save">−4:12</span>
+      </div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-station">Run Pace ×8</div>
+      <div class="gap-times">
+        <span class="gap-time was">5:54/km</span>
+        <span class="gap-time target">5:07/km</span>
+        <span class="gap-save">−6:16</span>
+      </div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-station">Sled Push (50m)</div>
+      <div class="gap-times">
+        <span class="gap-time was">4:03</span>
+        <span class="gap-time target">2:58</span>
+        <span class="gap-save">−1:05</span>
+      </div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-station">Farmers Carry (200m)</div>
+      <div class="gap-times">
+        <span class="gap-time was">2:50</span>
+        <span class="gap-time target">2:11</span>
+        <span class="gap-save">−0:39</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Fix for Each Gap</div>
+
+  <div class="gap-card">
+    <div class="gap-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+      <div class="gap-station" style="color:var(--orange)">Wall Balls — 4:32 to save</div>
+      <div style="font-size:11px;color:var(--grey-light);line-height:1.5;">Tue/Wed station work under fatigue · breathing skill (exhale every rep) · never train fresh</div>
+    </div>
+    <div class="gap-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+      <div class="gap-station" style="color:var(--orange)">Sandbag Lunge — 4:12 to save</div>
+      <div style="font-size:11px;color:var(--grey-light);line-height:1.5;">Thu Bulgarian Split Squats (never skip) · Wed/Tue lunges after runs · hip flexor mobility daily</div>
+    </div>
+    <div class="gap-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+      <div class="gap-station" style="color:var(--orange)">Run Pace — 6:16 to save</div>
+      <div style="font-size:11px;color:var(--grey-light);line-height:1.5;">Norwegian 4×4 every Tuesday · all tempo runs Thursday · this is your single biggest gain</div>
+    </div>
+    <div class="gap-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+      <div class="gap-station" style="color:var(--orange)">Sled Push — 1:05 to save</div>
+      <div style="font-size:11px;color:var(--grey-light);line-height:1.5;">Lower body strength (Back Squat / RDL) carries over directly</div>
+    </div>
+    <div class="gap-row" style="border-bottom:none;flex-direction:column;align-items:flex-start;gap:4px;">
+      <div class="gap-station" style="color:var(--orange)">Farmers Carry — 0:39 to save</div>
+      <div style="font-size:11px;color:var(--grey-light);line-height:1.5;">Wed heavy Farmer Carry 3×30m/hand · lock shoulders back · don't let grip fail</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ RACE DAY ═══════════════ -->
+<div id="tab-race" class="panel">
+
+  <div class="hero">
+    <div class="hero-label">HYROX October 2026</div>
+    <div class="hero-title">1:25:00</div>
+    <div class="hero-sub">Run your real pace. Trust the stations.</div>
+  </div>
+
+  <div class="section-title">Station Splits</div>
+
+  <div class="gap-card">
+    <div class="split-row split-run" style="border-radius:8px;margin:8px 16px 0;border-bottom:none;">
+      <div class="split-seg">Run 1</div>
+      <div class="split-target">5:07/km</div>
+      <div class="split-cue">Start conservative — trust your fitness</div>
+    </div>
+    <div style="height:8px;"></div>
+    <div class="gap-row" style="padding:10px 16px;">
+      <div class="split-seg">SkiErg 1000m</div>
+      <div class="split-target">~3:30</div>
+      <div class="split-cue">Steady rhythm · don't blow up on station 1</div>
+    </div>
+    <div class="split-row split-run" style="margin:0 16px;border-bottom:none;">
+      <div class="split-seg">Run 2</div>
+      <div class="split-target">5:07/km</div>
+      <div class="split-cue">Settle back into pace immediately</div>
+    </div>
+    <div style="height:8px;"></div>
+    <div class="gap-row" style="padding:10px 16px;">
+      <div class="split-seg">Sled Push 50m</div>
+      <div class="split-target">~2:58</div>
+      <div class="split-cue">Drive hips · short powerful steps</div>
+    </div>
+    <div class="split-row split-run" style="margin:0 16px;border-bottom:none;">
+      <div class="split-seg">Run 3</div>
+      <div class="split-target">5:07/km</div>
+      <div class="split-cue">—</div>
+    </div>
+    <div style="height:8px;"></div>
+    <div class="gap-row" style="padding:10px 16px;">
+      <div class="split-seg">Sled Pull 50m</div>
+      <div class="split-target">~2:30</div>
+      <div class="split-cue">Lean back · walk-pull rhythm</div>
+    </div>
+    <div class="split-row split-run" style="margin:0 16px;border-bottom:none;">
+      <div class="split-seg">Run 4</div>
+      <div class="split-target">5:07/km</div>
+      <div class="split-cue">—</div>
+    </div>
+    <div style="height:8px;"></div>
+    <div class="gap-row" style="padding:10px 16px;">
+      <div class="split-seg">Burpee Broad Jump 80m</div>
+      <div class="split-target">~4:00</div>
+      <div class="split-cue">Pace yourself · don't sprint first 20m</div>
+    </div>
+    <div class="split-row split-run" style="margin:0 16px;border-bottom:none;">
+      <div class="split-seg">Run 5</div>
+      <div class="split-target">5:07/km</div>
+      <div class="split-cue">—</div>
+    </div>
+    <div style="height:8px;"></div>
+    <div class="gap-row" style="padding:10px 16px;">
+      <div class="split-seg">Rowing 1000m</div>
+      <div class="split-target">~3:45</div>
+      <div class="split-cue">Sustainable damper · breathe</div>
+    </div>
+    <div class="split-row split-run" style="margin:0 16px;border-bottom:none;">
+      <div class="split-seg">Run 6</div>
+      <div class="split-target">5:07/km</div>
+      <div class="split-cue">—</div>
+    </div>
+    <div style="height:8px;"></div>
+    <div class="gap-row" style="padding:10px 16px;">
+      <div class="split-seg">Farmers Carry 2×24kg 200m</div>
+      <div class="split-target">2:11</div>
+      <div class="split-cue">Lock shoulders back · don't let grip fail</div>
+    </div>
+    <div class="split-row split-run" style="margin:0 16px;border-bottom:none;">
+      <div class="split-seg">Run 7</div>
+      <div class="split-target">5:07/km</div>
+      <div class="split-cue">—</div>
+    </div>
+    <div style="height:8px;"></div>
+    <div class="gap-row" style="padding:10px 16px;">
+      <div class="split-seg">Sandbag Lunges 100m</div>
+      <div class="split-target">5:11</div>
+      <div class="split-cue">Continuous pace · hip flexors open · breathe</div>
+    </div>
+    <div class="split-row split-run" style="margin:0 16px;border-bottom:none;">
+      <div class="split-seg">Run 8</div>
+      <div class="split-target">5:07/km</div>
+      <div class="split-cue">Last run — give everything you have left</div>
+    </div>
+    <div style="height:8px;"></div>
+    <div class="gap-row" style="padding:10px 16px; border-bottom:none; background:rgba(255,77,0,0.08);">
+      <div class="split-seg" style="color:var(--orange);font-size:14px;">Wall Balls 100 reps</div>
+      <div class="split-target" style="color:var(--orange);font-size:13px;">6:50</div>
+      <div class="split-cue" style="color:var(--orange-dim);color:#ff8c00;">EXHALE EVERY THROW · 30+ unbroken to start</div>
+    </div>
+  </div>
+
+  <div class="section-title">Half Marathon · 2 Weeks Later</div>
+  <div class="coach-note">
+    <p>Your legs will be primed from peak fitness. Run <strong>4:58/km from the gun</strong> and trust 20 weeks of work. This is what it was all for.</p>
+  </div>
+  <div class="stat-grid">
+    <div class="stat">
+      <div class="stat-label">HM Target</div>
+      <div class="stat-value orange">Sub 1:45</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Race Pace</div>
+      <div class="stat-value">4:58/km</div>
+    </div>
+  </div>
+
+  <div class="section-title">Nutrition Timing</div>
+  <div class="gap-card">
+    <div class="gap-row" style="flex-direction:column;align-items:flex-start;gap:4px;padding:12px 16px;">
+      <div class="nutrition-timing">Pre-session (−45 min)</div>
+      <div class="nutrition-detail">Banana or toast with peanut butter · readily available carbs</div>
+    </div>
+    <div class="gap-row" style="flex-direction:column;align-items:flex-start;gap:4px;padding:12px 16px;">
+      <div class="nutrition-timing">Post hard session (≤30 min)</div>
+      <div class="nutrition-detail">Protein shake + banana or rice/chicken · critical on Tue/Thu</div>
+    </div>
+    <div class="gap-row" style="flex-direction:column;align-items:flex-start;gap:4px;padding:12px 16px;">
+      <div class="nutrition-timing">Daily protein</div>
+      <div class="nutrition-detail">1.6–2.0g per kg bodyweight · muscle repair from double sessions</div>
+    </div>
+    <div class="gap-row" style="flex-direction:column;align-items:flex-start;gap:4px;padding:12px 16px;border-bottom:none;">
+      <div class="nutrition-timing">Wk 15 carb load</div>
+      <div class="nutrition-detail">Increase carbs 2 days before each race · extra water weight is normal</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ COACH NOTES ═══════════════ -->
+<div id="tab-coach" class="panel">
+
+  <div class="hero">
+    <div class="hero-label">Elite Coach Assessment</div>
+    <div class="hero-title">Strong Plan.<br>Two Real Risks.</div>
+    <div class="hero-sub">What an elite coach would add, challenge, and flag.</div>
+  </div>
+
+  <div class="section-title">What's Elite About This Plan</div>
+
+  <div class="rule-card">
+    <div class="rule-num">✓</div>
+    <div>
+      <div class="rule-title">Norwegian 4×4 is the right call</div>
+      <div class="rule-body">Your Garmin splits from that long run show you holding 5:40–5:55/km for 16.2km — solid aerobic base. The 4×4 protocol will directly target the 5:07/km ceiling. This is the most evidence-based HRmax interval protocol in endurance sport right now.</div>
+    </div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-num">✓</div>
+    <div>
+      <div class="rule-title">The fatigue-stacking on stations is correct</div>
+      <div class="rule-body">Ottawa showed RPE 10 on wall balls and lunges while running easy. The plan correctly diagnoses this as a fatigue-specificity problem, not a strength problem. Training stations post-interval is exactly how to fix it.</div>
+    </div>
+  </div>
+
+  <div class="rule-card">
+    <div class="rule-num">✓</div>
+    <div>
+      <div class="rule-title">Your current trajectory is real</div>
+      <div class="rule-body">Garmin's prediction shows 1:49:20 HM improving by 5 min in 30 days. That's genuine aerobic adaptation showing up. If that rate continues even at half speed, you hit 1:45 comfortably.</div>
+    </div>
+  </div>
+
+  <div class="section-title">What I'd Challenge</div>
+
+  <div class="rule-card" style="border-color:rgba(234,179,8,0.3);">
+    <div class="rule-num" style="color:#fbbf24;">⚠</div>
+    <div>
+      <div class="rule-title">Double sessions on Tue/Thu are aggressive for a 9–5</div>
+      <div class="rule-body">6am intervals + evening stations on back-to-back days is a 48hr fatigue window that most club athletes don't recover from properly. Your long run pace data from the last screenshot shows HR 143–180 within 5km — that's an enormous range suggesting inconsistent recovery. I'd trial Tue stations 4hrs minimum after the intervals, not same evening.</div>
+    </div>
+  </div>
+
+  <div class="rule-card" style="border-color:rgba(234,179,8,0.3);">
+    <div class="rule-num" style="color:#fbbf24;">⚠</div>
+    <div>
+      <div class="rule-title">53km peak week with gym ×2 needs honest sleep accounting</div>
+      <div class="rule-body">Week 11 is 53km + 2 gym sessions + station work. At 8hrs sleep that's manageable. At 6hrs with work stress it's an overreaching risk. Build a hard rule now: if sleep &lt;7hrs two nights in a row, drop Tuesday to easy and push the interval to Thursday. Non-negotiable.</div>
+    </div>
+  </div>
+
+  <div class="rule-card" style="border-color:rgba(234,179,8,0.3);">
+    <div class="rule-num" style="color:#fbbf24;">⚠</div>
+    <div>
+      <div class="rule-title">Your recent 5km interval session HR (143–180) needs attention</div>
+      <div class="rule-body">The pace analysis screenshot shows 5 intervals with HR going 143 → 164 → 172 → 179 → 180 across 5km. That's a strong cardiac drift — either you started too fast, your aerobic base isn't yet there for the target pace, or you weren't recovered. The 4:51–5:09 paces are already close to HM target. Good sign — but you're riding close to the edge early. Monitor this closely in weeks 5–8.</div>
+    </div>
+  </div>
+
+  <div class="section-title">What I'd Add</div>
+
+  <div class="rule-card" style="border-color:rgba(59,130,246,0.3);">
+    <div class="rule-num" style="color:#60a5fa;">+</div>
+    <div>
+      <div class="rule-title">Add a weekly HRV or perceived readiness check</div>
+      <div class="rule-body">Every Sunday morning, rate sleep quality (1–5) + perceived readiness (1–5). If combined score ≤6, reduce Tuesday's intensity by one notch. This costs you nothing and prevents 80% of overtraining injuries in double-session blocks.</div>
+    </div>
+  </div>
+
+  <div class="rule-card" style="border-color:rgba(59,130,246,0.3);">
+    <div class="rule-num" style="color:#60a5fa;">+</div>
+    <div>
+      <div class="rule-title">Add a wall ball breathing drill to every warm-up</div>
+      <div class="rule-body">30 reps with a focus only on exhale timing — no weight, just a medicine ball. Do this before Tuesday and Wednesday stations regardless of the session. This builds the motor pattern so it's automatic under race fatigue. 4 minutes. Ottawa was lost in the breathing.</div>
+    </div>
+  </div>
+
+  <div class="rule-card" style="border-color:rgba(59,130,246,0.3);">
+    <div class="rule-num" style="color:#60a5fa;">+</div>
+    <div>
+      <div class="rule-title">Set a long run HR ceiling, not pace target</div>
+      <div class="rule-body">Your Saturday splits show 5:28–5:56/km with HR 151–156 mid-run. That's the right zone. But add a rule: if HR hits 158 before km 12, slow down. Long runs done too hard are the most common reason runners miss their taper feeling good. Protect easy as easy.</div>
+    </div>
+  </div>
+
+  <div class="section-title">Bottom Line</div>
+  <div class="coach-note">
+    <p>This is a well-constructed plan for someone training dual-goal with a real work schedule. The diagnosis of Ottawa is accurate. The prescription is correct. The risk is execution discipline — not the plan itself. <strong>The athletes who hit sub-1:25 HYROX with a sub-1:45 HM two weeks later aren't doing more training than this. They're doing this training better: showing up recovered, keeping easy days easy, and being ruthless about the hard sessions.</strong></p>
+  </div>
+</div>
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function toggleSession(card) {
+    card.classList.toggle('open');
+  }
+</script>
+</body>
+</html>
